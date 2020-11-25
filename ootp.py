@@ -139,18 +139,19 @@ class Simulation:
     def watch_file_updates(self):
         new_time = 0
         while new_time <= self.file_time:
-            sleep(1)
+            sleep(3.0)
             new_time = path.getmtime(self.file_path)
         self.file_time = new_time
         self.create_soup()
 
     def create_soup(self):
         with open(self.file_path, 'r') as f:
-            self.soup = BeautifulSoup(f, 'lxml')
+            self.soup = BeautifulSoup(f, "html.parser")
+            #self.soup = BeautifulSoup(f, 'lxml')
 
 
 class Stats:
-
+        
     def __init__(self):
         self.stats = {'team_batting': [],
                       'team_pitching': [],
@@ -230,6 +231,7 @@ class Stats:
 
     def send_to_csv(self, prepend=None, append=None, path=None):
 
+        print("to csv")
         for key in self.df_dict.keys():
             path_list = [path, prepend, key, append, '.csv']
             path_string = ''.join(
@@ -260,25 +262,30 @@ class PlayMenu:
         self.x, self.y = pyautogui.position()
 
     def open(self):
-        pyautogui.moveTo(self.x, self.y, .1)
-        pyautogui.click()
+        pyautogui.moveTo(self.x, self.y, .4)
+        sleep(.05)
+        # pyautogui.click()
+        Mouse.click('left')
+        sleep(.05)
 
 
 class SimMenu:
 
-    def __init__(self):
-        input('Move the mouse to the \'Simulation Module\' selection in the Play menu and press Enter.')
-        self.x, self.y = pyautogui.position()
-        input('Close the window and press Enter again.')
+    # Edit locations or add in function call
+    def __init__(self, x=1259, y=676):
+        self.x, self.y = x, y
 
     def open(self):
         pyautogui.moveTo(self.x, self.y, .25)
-        pyautogui.click()
+        sleep(.05)
+        # pyautogui.click()
+        Mouse.click('left')
+        sleep(.05)       
 
 
 class SimModule:
 
-    def __init__(self, x=1000, away_y=430, home_y=475, clear_y=35, button_y=675, file_path=None):
+    def __init__(self, x=1011, away_y=471, home_y=425, clear_y=441, button_y=692, file_path=None):
         self.x = x
         self.away_y = away_y
         self.home_y = home_y
@@ -287,7 +294,19 @@ class SimModule:
         if file_path is not None:
             self.update_team_locations(file_path)
         else:
-            self.locs = {}
+            # locsAway is the top dropdown box
+            # EDIT LOCATIONS!
+            self.locsAway = {'BOI': 469,'CAN': 493,'DVS': 517,'DET': 543,
+                             'IND': 566,'KAS': 586,'NSH': 614,'NO': 636,
+                             'NYV': 661,'OBX': 687,'PRO': 708,'SAS': 732,
+                             'SAR': 757,'VAN': 779}
+            # locsHome is the bottom dropdown box.
+            # EDIT LOCATIONS!
+            self.locsHome = {'BOI': 518,'CAN': 540,'DVS': 560,'DET': 587,
+                             'IND': 612,'KAS': 636,'NSH': 659,'NO': 685,
+                             'NYV': 705,'OBX': 731,'PRO': 756,'SAS': 776,
+                             'SAR': 804,'VAN': 827}
+
 
     def update_team_locations(self, file_path):
         self.locs = {}
@@ -298,38 +317,57 @@ class SimModule:
 
     def set_window_params(self):
         input('Move the mouse to the Away Team selection menu and press Enter.')
-        self.x, self.away_y = pyautogui.positon()
+        self.x, self.away_y = pyautogui.position()
         input('Move the mouse to the Home Team selection menu and press Enter.')
-        self.home_y = pyautogui.positon()[1]
+        self.home_y = pyautogui.position()[1]
         input('Move the mouse to the \'Simulate\' button and press Enter.')
         self.button_y = pyautogui.position()[1]
 
     def clear_matchup(self):
         for team in (self.home_y, self.away_y):
             pyautogui.moveTo(self.x, team, .1)
-            pyautogui.click()
-            pyautogui.moveTo(self.x, self.clear_y, .1)
-            pyautogui.click()
+            sleep(.05)
+            # pyautogui.click()
+            Mouse.click('left')
+            #pyautogui.moveTo(self.x, self.clear_y, 2.1)
+            pyautogui.moveRel(0,20,.1)
+            sleep(.05)
+            # pyautogui.click()
+            Mouse.click('left')
+            sleep(.05)
 
     def update_team(self, new_y, type='home'):
         if type == 'home':
             pyautogui.moveTo(self.x, self.home_y, .1)
         else:
             pyautogui.moveTo(self.x, self.away_y, .1)
-        pyautogui.click()
-        pyautogui.moveTo(self.x, new_y, .1)
-        pyautogui.click()
+        sleep(.05)
+        # pyautogui.click()
+        Mouse.click('left')
+        sleep(.05)
+        pyautogui.moveTo(self.x, new_y, .2)
+        sleep(.05)
+        # pyautogui.click()
+        # sleep(.05)
+        Mouse.click('left')
+        sleep(.05)
 
     def simulate(self):
-        pyautogui.moveTo(self.x, self.button_y, .25)
-        pyautogui.click()
+        pyautogui.moveTo(self.x, self.button_y, .1)
+        # sleep(.05)
+        # pyautogui.click()
+        # sleep(.05)
+        sleep(.05)
+        Mouse.click('left')
+        sleep(.05)
 
 
 class ResetWindow:
 
-    def __init__(self, x=1848, y=10):
-        self.x, self.y = x, y
-        self.restore_position()
+    def __init__(self, x=241, y=1063):
+        self.x = x
+        self.y = y
+        # self.restore_position()
         self.iterations = 0
 
     def restore_position(self):
@@ -345,13 +383,27 @@ class ResetWindow:
 
     def reset(self):
         sleep(.5)
-        pyautogui.click(self.x, self.y)
+        pyautogui.moveTo(self.x, self.y, .1)
+        Mouse.click('left')
+        #,pyautogui.click(self.x, self.y)
         sleep(.5)
-        pyautogui.click()
+        Mouse.click('left')
+        # pyautogui.click()
         sleep(.5)
 
     def restore(self):
-        pyautogui.click(self.x, self.y)
+        # pyautogui.click(self.x, self.y)
+        pyautogui.moveTo(self.x, self.y, .1)
+        Mouse.click('left')
         sleep(.75)
-        pyautogui.click(self.rest_x, self.rest_y)
+        # pyautogui.click(self.rest_x, self.rest_y)
+        Mouse.click('left')
         sleep(.75)
+        
+# pyautogui.click() does not work intermittently. Manually down and up click
+class Mouse:
+
+    def click(button):
+        pyautogui.mouseDown(button=button)
+        sleep(.05)
+        pyautogui.mouseUp(button=button)
